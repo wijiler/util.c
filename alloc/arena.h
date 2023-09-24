@@ -36,6 +36,7 @@ typedef struct { struct pool* start,*end; } arena;
 arena* init_arena(void* start)
 {
   arena* ar = malloc(sizeof(arena) + sizeof(start));
+  ar->start = nreg(start);
   ar->start->count = 1;
   ar->start->cCapacity = sizeof(start);
   ar->start->data = LLinit(start);
