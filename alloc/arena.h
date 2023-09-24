@@ -4,7 +4,7 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<stdbool.h>
-#include "../data/data.h"
+#include "../data.h"
 // loosely based on https://github.com/tsoding/arena/blob/master/arena.h
 
 // region of memory
@@ -22,6 +22,15 @@ struct pool* nreg(void* start)
   nr->count = 1;
   nr->cCapacity = sizeof(LinkedList) + sizeof(start);
   nr->data = LLinit(start);
+  return nr;
+}
+// NOTE: do not use as enduser
+struct pool* nreg_ll(LinkedList* start)
+{
+  struct pool* nr = malloc(sizeof(struct pool));
+  nr->count = 1;
+  nr->cCapacity = sizeof(LinkedList) + sizeof(start);
+  nr->data = start;
   return nr;
 }
 // NOTE: do not use as enduser
@@ -46,20 +55,22 @@ void arena_alloc(arena* a, LinkedList* data)
 {
   if (a->start->next == NULL)
     {
-      a->end = nreg(data);
+      a->end = nreg_ll(data);
       a->start->next = a->end;
     }
   else if(a->start->next == a->end)
     {
-      struct pool* npool = nreg(data);
-      struct pool* oend = nreg(a->end->data);
+      struct pool* npool = nreg_ll(data);
+      struct pool* oend = nreg_ll(a->end->data);
       a->start->next = oend; a->end = npool; a->start->next->next = a->end;
     }
   else {
     struct pool* lp = a->start->next;
     while (lp != a->end)
       lp = lp->next;
-
+    struct pool* oend = nreg_ll(a->end->data);
+    lp->next = oend;
+    a->end = nreg_ll(data);
   }
 }
 #endif // ARENA_H_
