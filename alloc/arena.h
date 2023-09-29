@@ -41,7 +41,10 @@ void areg(struct pool* pool_v, void* item) {
 }
 // arena allocator
 typedef struct { struct pool* start,*end; } arena;
-// initialize a new arena
+/*
+ * Descrip: Intializes an arena allocator
+ * Param(start) | void* => the first bit of memory you want to allocate
+*/
 arena* init_arena(void* start)
 {
   arena* ar = malloc(sizeof(arena) + sizeof(start));
@@ -51,26 +54,68 @@ arena* init_arena(void* start)
   ar->start->data = LLinit(start);
   return ar;
 }
+/*
+ * Descrip: allocates a new pool of memory to an arena allocater
+ * Param(a) | arena* => the arena you want to alloc to
+ * Param(data) | LinkedList* => the data you want to allocate in the new pool
+ */
 void arena_alloc(arena* a, LinkedList* data)
 {
   if (a->start->next == NULL)
     {
       a->end = nreg_ll(data);
       a->start->next = a->end;
+      return;
     }
   else if(a->start->next == a->end)
     {
       struct pool* npool = nreg_ll(data);
       struct pool* oend = nreg_ll(a->end->data);
       a->start->next = oend; a->end = npool; a->start->next->next = a->end;
+      return;
     }
-  else {
     struct pool* lp = a->start->next;
     while (lp != a->end)
       lp = lp->next;
     struct pool* oend = nreg_ll(a->end->data);
     lp->next = oend;
     a->end = nreg_ll(data);
-  }
+}
+/*
+ * Descrip => allocates a new pool of memory to an arena allocater
+ * Param(a) | arena* => the arena you want to alloc to
+ * Param(data) | void* => the variable you want to allocate in the new pool
+ */
+void arena_alloc_var(arena* a, void* data)
+{
+  if (a->start->next == NULL)
+    {
+      a->end = nreg(data);
+      a->start->next = a->end;
+      return;
+    }
+  else if(a->start->next == a->end)
+    {
+      struct pool* npool = nreg(data);
+      struct pool* oend = nreg(a->end->data);
+      a->start->next = oend; a->end = npool; a->start->next->next = a->end;
+      return;
+    }
+    struct pool* lp = a->start->next;
+    while (lp != a->end)
+      lp = lp->next;
+    struct pool* oend = nreg_ll(a->end->data);
+    lp->next = oend;
+    a->end = nreg(data);
+}
+/*
+ * Descrip []=> [resizes;adds] |> memory to the specifed pool of an arena
+ * Param(a) | arena* => the arena you need to realloc to
+ * Param(index) | int => the index of the pool you need to realloc
+ * Param(value) | void* => the optional value you want to append to the data
+*/
+void arena_realloc(arena* a,int index,void* value)
+{
+
 }
 #endif // ARENA_H_

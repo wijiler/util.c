@@ -30,6 +30,7 @@ LinkedList* LLinit(void* init) {
   LinkedList* nll = malloc(sizeof(LinkedList));
   nll->begin = newreg(init);
   nll->count = 1; //[0,1]
+
   return nll;
 }
 /*
@@ -48,12 +49,11 @@ void LLappend(LinkedList* LL,void* data) {
       nb = nb->next;
     nb->next = newreg(LL->end->data);
     LL->end = newreg(data);
+    return;
   }
-  else
-  {
     LL->begin->next = newreg(data);
     LL->end = newreg(data);
     LL->end->next = NULL;
-  }
+    return;
 }
 #endif // DATA_H_
