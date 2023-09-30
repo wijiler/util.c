@@ -4,6 +4,7 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<stdbool.h>
+#include<stdio.h>
 #include "../data.h"
 // loosely based on https://github.com/tsoding/arena/blob/master/arena.h
 
@@ -109,13 +110,21 @@ void arena_alloc_var(arena* a, void* data)
     a->end = nreg(data);
 }
 /*
- * Descrip []=> [resizes;adds] |> memory to the specifed pool of an arena
- * Param(a) | arena* => the arena you need to realloc to
- * Param(index) | int => the index of the pool you need to realloc
- * Param(value) | void* => the optional value you want to append to the data
+ * Descrip => get a pointer to a pool so you can mess with the pool
+ * Param(a) | arena* => the arena you want to get the value from
+ * Param(index) | int => the index of the pool you want
 */
-void arena_realloc(arena* a,int index,void* value)
+struct pool* arena_get(arena* a,int index)
 {
-
+  struct pool* npool = a->start->next;
+  int i;
+  for (i = 0;i <= index;i++) {
+    npool = npool->next;
+    if (i < index && npool == a->end) {
+      printf("Trying to get to a nonexistent pool");
+      return NULL;
+    }
+  }
+  return npool;
 }
 #endif // ARENA_H_

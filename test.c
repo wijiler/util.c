@@ -6,5 +6,8 @@ int main (void) {
   arena* nar = init_arena(o);
   arena_alloc(nar,LLinit(o));
   arena_alloc(nar,LLinit(o));
-  arena_alloc(nar,LLinit(o));
+  arena_alloc_var(nar,o);
+  struct pool* testpool = arena_get(nar,1);
+  free(nar);
+  free(testpool);
 }
